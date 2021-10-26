@@ -134,7 +134,10 @@ leetcode:
 
 
 
-
+1.scrollHeight, scrollTop, cliHeight
+scrollHeight,包含卷轴的高度。
+scrollTop，你内容卷轴的距离，是内容顶端与相对顶端的距离
+cliHeight, 不包含卷轴的距离
             
         
     
