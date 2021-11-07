@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        /*
+        1.数组的方法
+        push 返回长度,
+        pop 尾部删除，返回删除的元素
+        shift 头部添加，返回长度
+        unshift 头部删除，返回删除的元素
+        map, (function(item, index, arr){}, this ); 返回函数执行完的新数组
+        slice(), 浅拷贝
+        splice(开始位置, 删除个数, 插入的元素)
+        filter(function(item, index, arr){}, this ); 返回函数表达式相等的元素
+        find(function(item, index, arr){}, this ); 找到第一个在函数里面表达性相等的值
+        some(function(item, index, arr){}, this); 测试数组中是不是至少有1个元素通过了被提供的函数测试。
+        every(function(item, index, arr){}, this); 测试数组中的每一个元素，是否通过提供的函数测试。
+        reduce(); intivalue只执行一次，当前执行函数的值，数组中正在处理的值
+        */
+        // 闭包，能够有权访问另一个函数的变量的函数
+        // 防抖，最后一次执行
+        function debounce(fn, delay){
+            let flag = true;
+            let timer = null;
+            return function(){
+                let that = this;
+                let args = [...arguments];
+                if(flag){
+                    fn.apply(that, args)
+                    flag = false;
+                }
+                if(timer){
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(()=>{
+                    fn.apply(that, args);
+                }, delay);
+            }
+        }
+        // 防抖,每两2s执行一次
+        function throttle(fn, delay){
+            let previous = 0;
+            let now = 0;
+            // if(){}
+            return function(){
+                let that = this;
+                now = +new Date();
+                if(now - previous >= delay){
+                    fn.apply(that, args);
+                    previous = now;
+                }
+            }
+        }
+        //this指向，分为显示绑定，隐式绑定， 硬绑定， new绑定。
+        // js的设计模式
+        // 单例
+        function instance(){
+            let wrap = document.querySelector('.wrap') || undefined;
+            if(!wrap){
+                wrap = document.createElement('div');
+                document.body.appendChild(div);
+            }
+            return wrap;
+            // if(){}
+        }
+        // 观察者模式
+        class Subject{
+            constructor(){
+                this.sub = {};
+            }
+            // 添加订阅
+            add(key, fn){
+                // this.sub.push(()=>{
+                //     // fn();
+                //     // item.notity();
+                // });
+                if(!this.sub[key]){
+                    this.sub[key] = [];
+                }
+                this.sub[key].push(fn)
+            }
+            // 发布订阅
+            notice(key, name){
+                // this.sub.forEach((subFn)=>{
+                //     subFn();
+                // });
+                let len = this.sub[key].length;
+                if(!this.sub[key]){
+                    return '没有这个订阅信息~';
+                }
+                for (let i = 0; i < len; i++) {
+                    // const element = array[i];
+                    this.sub[key][i](name);
+                    
+                }
+            }
+        }
+        class Observe{
+            constructor(name){
+                this.name = name;
+            }
+            notity(){
+                console.log('我被通知了', this.name);
+            }
+        }
+        let sub = new Subject();
+        // 添加订阅者
+        sub.add('sing', (songName)=>{
+            console.log('sing 订阅者01 歌名为 ', songName)
+        });
+        sub.add('sing', (songName)=>{
+            console.log('sing 订阅者02 歌名为 ', songName)
+        });
+        sub.add('dance', (danceName)=>{
+            console.log('dance 订阅者01 舞蹈为 ', danceName)
+        });
+        // 
+        sub.notice('sing', 'hello world');
+        sub.notice('dance', '爱的华尔兹');
+        // 手动实现一个继承
+        function extend(child, parent){
+            function F() {};
+            F.prototype = parent.prototype;
+            child.prototype = new F();
+            child.prototype.constructor = child;
+        }
+        // 实现new 一个对象的过程
+        // 获取构造函数
+        // 创建一个新对象，将改对象的prototype执行构造函数
+        // 构造函数内容，改变this执行, 并执行构造函数
+        // 
+        function new2(){
+            let obj = new Object();
+            let [fn, args] = [...arguments];
+            obj.prototype = fn.prototype;
+            fn.apply(obj, args);
+        }
+        // 手动实现一个object.create();
+        function Create(proto){
+            
+            function F(){};
+            F.prototype = proto;
+            F.prototype.constructor = F;
+            return new F();
+        }
+        // call的实现，apply的实现，bind的实现
+        // fn.call(obj, a, b);
+        function call2(){
+            // 1.获取参数
+            // 2.然后改变this执行，传递参数，并执行
+            let [that, ...args] = [...arguments];
+            // that
+            let fn = Symbol();
+            that[fn] = this;
+            let r = that.fn(...args);
+            delete that.fn;
+            return r;
+            // let context = this;
+            // context.fn
+        }
+        // apply 的实现
+        Function.prototype.apply2 = function(){
+            let [that, ...args] = [...arguments];
+            let fn = Symbol();
+            that[fn] = this;
+            let r = that[fn](...args);
+            delete that.fn;
+            return r;
+        }
+        var zhou = {
+            age: 18,
+            love: 'coding',
+            hello: function (age) {
+                console.log("hello world, i am zhou," + age + "," + this.love);
+            }
+        };
+        var wang= {
+            age: 19,
+            love: 'sleeping'
+        };
+        // zhou.hello.call();
+        // hello world, i am zhou,undefined window love
+        
+        // hello world, i am zhou,23 sleeping
+        //bind实现
+        // let a = zhou.hello.bind2(wang, [23, 25, 90, 8])
+        // a();,  作为new的实现
+        // 
+        
+        Function.prototype.bind2 = function(){
+            // let []
+            let that = this;
+            const [context, ...args] = [...arguments];
+            function Fbound(){
+
+                let args2 = [...arguments];
+                // 两个this
+                that.apply(this instanceof Fbound ? this: context, [...args, ...args2]);
+            };
+            Fbound.prototype = this.prototype;
+            // return function(){
+                
+            // }
+            return Fbound;
+        }
+        let test = zhou.hello.bind2(wang, 23)
+        let test2 = new test(24);
+        // 手写promise
+        // 
+        // new promise((resolve, reject)=>{
+
+        //}).then(()=>{}, ()=>{})
+        class Promise2{
+            constructor(callback){
+                this.status = 'pending';
+                this.resolveValue = null;
+                this.rejectError = null;
+                this.resolveArr = [];
+                this.rejectArr = [];
+                this.resolve = (value)=>{
+                    this.status = 'resolve';
+                    this.resolveValue = value;
+                    this.resolveArr.forEach(fn => {
+                        fn();
+                    });
+                };
+                this.reject = (error)=>{
+                    this.status = 'reject';
+                    this.rejectError = error;
+                    this.rejectArr.forEach(fn => {
+                        fn();
+                    });
+                };
+                try {
+                    callback(this.resolve, this.reject);
+                } catch (error) {
+                    reject(error);
+                } 
+            }
+            
+            then(resolveCallback, rejectCallback){
+                if(this.status === 'resolve'){
+                    resolveCallback(this.resolveValue);
+                }
+                if(this.status === 'reject'){
+                    rejectCallback(this.rejectError);
+                }
+                if(this.status === 'pending'){
+                    this.resolveArr.push(()=>{
+                        resolveCallback();
+                    });
+                    this.rejectArr.push(()=>{
+                        rejectCallback();
+                    });
+                }
+            }
+        }
+        // promise([p1, p2, p3]);
+        new Promise2((resolve, reject)=>{
+            console.log('111');
+            resolve(5);
+        }).then((value)=>{
+            console.log('2222', value);
+        });
+        // promise all
+        function promiseAll (arr){
+            if(!Array.isArray(arr)){
+                return;
+            }
+            // arr.length === 0
+            let index = 0;
+            let valueArr = [];
+            return new Promise((resolve, reject)=>{
+                for (let i = 0; i < arr.length; i++) {
+                    const element = arr[i];
+                    Promise.resolve(element).then((value)=>{
+                        if(index === arr.length - 1){
+                            resolve(valueArr);
+                        }else{
+                            valueArr.push(value);
+                            index++;
+                        }
+                    }).catch((err)=>{
+                        reject(err);
+                    });
+                    
+                }
+            });
+        }
+        // 深比对
+        function deepCompare(obj1, obj2){
+            // 基础数据类型, 不考虑NaN === NaN的情况下
+            if(typeof obj1 !== 'object' || typeof obj2 !== 'object'){
+                return obj1 === obj2;
+            }
+            // 毕竟keys重复
+            let len1 = Object.keys(obj1);
+            let len2 = Object.keys(obj2);
+            if(len1 !== len2){
+                return false;
+            }
+            for (const key in obj1) {
+                if (Object.hasOwnProperty.call(obj1, key)) {
+                    const element = object[key];
+                    let result = deepCompare(obj1, obj2);
+                    if(!result){
+                        return result;
+                    };
+                }
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
