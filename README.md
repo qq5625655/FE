@@ -138,11 +138,90 @@ leetcode:
 scrollHeight,包含卷轴的高度。
 scrollTop，你内容卷轴的距离，是内容顶端与相对顶端的距离
 cliHeight, 不包含卷轴的距离
-            
-        
-    
-
-
-
 
     
+
+
+
+
+1.项目的背景是什么；
+2.当前项目的目的是什么；
+3.在开发过程中，你的角色是什么；
+4.在开发过程中有遇到过什么样的难题；
+5.遇到这些问题，你都是如何进行解决的；
+6.项目完成之后，取得了哪些成果；
+
+
+
+1.项目背景就是crm的块头太大，所以要按照模块拆分.
+左侧菜单栏大约有30多个菜单栏，其中大约有6个菜单下，还拥有子菜单。
+这样一个磐石应用，太大了，所以决定需要将这些内容是进行拆分。
+下属大约销售模块。
+销售模块里有：
+- 自我看板
+- 有销售统计，
+- 销售微信管理，
+- 班主任
+- 排行榜
+
+数据
+- 公共leads
+<!-- - 我的工单 -->
+- 班级管理
+- 
+系统管理
+- 系统设置，销售定标，跑马灯，短信推送等等。
+- 积分管理
+- 商城兑换管理
+
+转介绍
+- 朋友圈赠课
+- 转介绍管理
+
+2.开发角色
+- 主c，架构方面
+
+3.遇到了什么样的难题
+- 如何父子之间更好的通信，
+- 自定义通信
+
+- 主应用初始化vux，然后传递vuex到子应用里面
+
+- 如何将公共包安装到主子项目里面
+- 1. 通过npm包的形式，将这些包导入进去, 但是会重复按照，一些内容无法解决
+- 2. 通过cdn的形式，将npm打入进去
+- 解决css污染的问题
+- 1.在多个子应用加载的时候，通过何种方式，将子应用加载。
+- 2.可以在全局的body加上对应的class名称，然后在去相应的赋值
+```javascript
+async function mount(props){
+  //给body加class,以解决全局样式污染
+  document.body.classList.add('app-vue-history')
+}
+async function unmount(props){
+  //去掉body的class
+  document.body.classList.remove('app-vue-history')
+}
+.app-vue-history{
+    h1{
+        color: red
+    }
+}
+```
+- 子系统如何实现keep-alive
+
+查看single-spa-vue源码可以发现，在unmount生命周期，它将vue实例destroy（销毁了）并且清空了DOM。所以实现keep-alive的关键在于子系统的unmount周期中不销毁vue实例并且不清空DOM，采用display:none来隐藏子系统。而在mount周期，先判断子系统是否存在，如果存在，则去掉其display:none即可。
+
+
+4.如何解决这些难题
+5.完成后，有了哪些成果
+
+
+
+
+1. 基础，js，html，css，vue，react，vue-router， 算法，ts，webpack，
+2. 项目， 脚手架，微前端，axios，项目名
+
+
+
+
